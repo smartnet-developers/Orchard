@@ -67,10 +67,10 @@
           </td>
           @Display(entry)
                 <td>
-                    @Display(New.DateTimeRelative(dateTimeUtc: entry.User.CreatedUtc))
+                    @Display(New.DateTimeRelative(dateTimeUtc: Model.Users[userIndex].CreatedUtc))
                 </td>
                 <td>
-                    @Display(New.DateTimeRelative(dateTimeUtc: entry.User.LastLoginUtc))
+                    @Display(New.DateTimeRelative(dateTimeUtc: Model.Users[userIndex].LastLoginUtc))
                 </td>
         </tr>
         userIndex++;

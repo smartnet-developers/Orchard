@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Orchard.Users.Models;
-using Orchard.DisplayManagement.Shapes;
+﻿using Orchard.DisplayManagement.Shapes;
+using System;
+using System.Collections.Generic;
 
 namespace Orchard.Users.ViewModels {
 
@@ -14,6 +14,8 @@ namespace Orchard.Users.ViewModels {
     public class UserEntry {
         public int UserId { get; set; }
         public bool IsChecked { get; set; }
+        public DateTime? CreatedUtc { get; set; }
+        public DateTime? LastLoginUtc { get; set; }
     }
 
     public class UserIndexOptions {

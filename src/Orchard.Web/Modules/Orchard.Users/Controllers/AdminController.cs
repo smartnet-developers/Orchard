@@ -111,7 +111,7 @@ namespace Orchard.Users.Controllers {
             }
 
             model.Users = results
-                .Select(x => new UserEntry { UserId = x.Record.Id })
+                .Select(x => new UserEntry { UserId = x.Record.Id, CreatedUtc = x.Record.CreatedUtc, LastLoginUtc = x.Record.LastLoginUtc })
                 .ToList();
 
             // maintain previous route data when generating page links
