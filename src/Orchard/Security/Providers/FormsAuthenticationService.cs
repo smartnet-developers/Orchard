@@ -14,14 +14,25 @@ namespace Orchard.Security.Providers {
         private readonly IClock _clock;
         private readonly IContentManager _contentManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ISslSettingsProvider _sslSettingsProvider;
+        private readonly IMembershipValidationService _membershipValidationService;
+
         private IUser _signedInUser;
         private bool _isAuthenticated;
 
-        public FormsAuthenticationService(ShellSettings settings, IClock clock, IContentManager contentManager, IHttpContextAccessor httpContextAccessor) {
+        public FormsAuthenticationService(
+            ShellSettings settings, 
+            IClock clock, 
+            IContentManager contentManager, 
+            IHttpContextAccessor httpContextAccessor,
+            ISslSettingsProvider sslSettingsProvider,
+            IMembershipValidationService membershipValidationService) {
             _settings = settings;
             _clock = clock;
             _contentManager = contentManager;
             _httpContextAccessor = httpContextAccessor;
+            _sslSettingsProvider = sslSettingsProvider;
+            _membershipValidationService = membershipValidationService;
 
             Logger = NullLogger.Instance;
             
@@ -50,8 +61,8 @@ namespace Orchard.Security.Providers {
             var encryptedTicket = FormsAuthentication.Encrypt(ticket);
 
             var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket) {
-                HttpOnly = true, 
-                Secure = FormsAuthentication.RequireSSL, 
+                HttpOnly = true,
+                Secure = _sslSettingsProvider.GetRequiresSSL(),
                 Path = FormsAuthentication.FormsCookiePath
             };
 
@@ -130,8 +141,15 @@ namespace Orchard.Security.Providers {
                 return null;
             }
 
+            // todo: this issues a sql query for each authenticated request
+            _signedInUser = _contentManager.Get(userId).As<IUser>();
+
+            if (_signedInUser == null || !_membershipValidationService.CanAuthenticateWithCookie(_signedInUser)) {
+                return null;
+            }
+
             _isAuthenticated = true;
-            return _signedInUser = _contentManager.Get(userId).As<IUser>();
+            return _signedInUser;
         }
 
         private string GetCookiePath(HttpContextBase httpContext) {
